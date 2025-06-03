@@ -32,7 +32,7 @@ class UserListFragment : ViewModelFragment<FragmentUserListBinding, UserViewMode
 
     override fun initView() {
         adapter = UserAdapter { user ->
-            val action = UserListFragmentDirections.actionUserListFragmentToUserDetailFragment(user.id)
+            val action = UserListFragmentDirections.actionUserListFragmentToUserDetailFragment(user.id.toString())
             findNavController().navigate(action)
         }
         binding.recyclerViewUsers.adapter = adapter

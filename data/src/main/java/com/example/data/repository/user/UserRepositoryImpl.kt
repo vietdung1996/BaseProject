@@ -1,4 +1,4 @@
-package com.example.data.repository
+package com.example.data.repository.user
 
 import com.example.data.mapper.toDomain
 import com.example.data.remote.datasource.UserRemoteDataSource

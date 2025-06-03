@@ -1,6 +1,6 @@
 package com.example.data.di
 
-import com.example.data.repository.UserRepositoryImpl
+import com.example.data.repository.user.UserRepositoryImpl
 import com.example.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module

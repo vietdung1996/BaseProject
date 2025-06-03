@@ -23,16 +23,16 @@ class UserDetailViewModel @Inject constructor(
      * Get user by id from repository
      */
     fun getUserById(userId: String) {
-        executeTask {
-            userRepository.getUserById(userId)
-                .collect { user ->
-                    if (user != null) {
-                        _userState.value = UserDetailState.Success(user)
-                    } else {
-                        _userState.value = UserDetailState.Error("User not found")
-                    }
-                }
-        }
+//        executeTask {
+//            userRepository.getUserById(userId.toInt())
+//                .collect { user ->
+//                    if (user != null) {
+//                        _userState.value = UserDetailState.Success(user)
+//                    } else {
+//                        _userState.value = UserDetailState.Error("User not found")
+//                    }
+//                }
+//        }
     }
 }
 

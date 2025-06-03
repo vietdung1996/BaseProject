@@ -74,13 +74,13 @@ class UserDetailFragment : ViewModelFragment<FragmentUserDetailBinding, UserDeta
         binding.textViewEmail.text = user.email
         binding.textViewId.text = "ID: ${user.id}"
 
-        user.avatarUrl?.let { url ->
-            binding.imageViewAvatar.load(url) {
-                crossfade(true)
-                placeholder(R.drawable.ic_person)
-                error(R.drawable.ic_person)
-                transformations(CircleCropTransformation())
-            }
-        } ?: binding.imageViewAvatar.load(R.drawable.ic_person)
+//        user.avatarUrl?.let { url ->
+//            binding.imageViewAvatar.load(url) {
+//                crossfade(true)
+//                placeholder(R.drawable.ic_person)
+//                error(R.drawable.ic_person)
+//                transformations(CircleCropTransformation())
+//            }
+//        } ?: binding.imageViewAvatar.load(R.drawable.ic_person)
     }
 } 

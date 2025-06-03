@@ -2,7 +2,7 @@ package com.example.data.common.di
 
 import com.example.data.common.network.interceptor.AuthInterceptor
 import com.example.data.common.network.interceptor.LoggingInterceptor
-import com.example.data.remote.user.UserApi
+import com.example.data.remote.api.UserApiService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -67,7 +67,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideUserApi(retrofit: Retrofit): UserApi {
-        return retrofit.create(UserApi::class.java)
+    fun provideUserApi(retrofit: Retrofit): UserApiService {
+        return retrofit.create(UserApiService::class.java)
     }
 } 
