@@ -53,7 +53,7 @@ android {
 dependencies {
     // Module dependencies - Clean Architecture: app only depends on domain and core
     implementation(project(":domain"))
-    implementation(project(":data")) // Still needed for DI binding, but will be removed after creating proper abstraction
+    implementation(project(":data")) // TODO: Remove this after creating proper DI abstraction
     implementation(project(":core"))
     
     // Core Android
