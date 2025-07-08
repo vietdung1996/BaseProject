@@ -2,6 +2,9 @@ package com.example.core.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.state.UiState
+import com.example.core.mapper.UiStateMapper.toUiState
+import com.example.domain.util.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -11,22 +14,72 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
- * Base ViewModel với hỗ trợ xử lý lỗi và hiển thị loading
+ * Enhanced Base ViewModel with improved state management and error handling
+ * Uses UiState for consistent state representation across the app
  */
 abstract class BaseViewModel : ViewModel() {
 
-    private val _loading = MutableStateFlow(false)
-    val loading: StateFlow<Boolean> = _loading
-
-    private val _error = MutableSharedFlow<String>()
-    val error: SharedFlow<String> = _error
+    // Removed individual loading and error flows in favor of UiState pattern
+    // Child classes should manage their own state using UiState
 
     /**
-     * Thực hiện công việc với try-catch và tự động xử lý loading/error
-     * @param dispatcher CoroutineDispatcher sử dụng cho công việc
-     * @param showLoading Có hiển thị loading khi thực hiện không
-     * @param block Khối lệnh cần thực hiện
+     * Executes a domain operation and maps the result to UiState
+     * @param dispatcher CoroutineDispatcher for the operation
+     * @param stateFlow MutableStateFlow to update with the result
+     * @param operation Domain operation that returns a Result
      */
+    protected fun <T> executeOperation(
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        stateFlow: MutableStateFlow<UiState<T>>,
+        operation: suspend () -> Result<T>
+    ) {
+        viewModelScope.launch(dispatcher) {
+            stateFlow.value = UiState.Loading
+            try {
+                val result = operation()
+                stateFlow.value = result.toUiState()
+            } catch (e: Exception) {
+                stateFlow.value = UiState.Error(
+                    message = e.message ?: "An unexpected error occurred",
+                    throwable = e
+                )
+            }
+        }
+    }
+
+    /**
+     * Executes a domain operation with callback-based result handling
+     * @param dispatcher CoroutineDispatcher for the operation
+     * @param onResult Callback for handling the result
+     * @param operation Domain operation that returns a Result
+     */
+    protected fun <T> executeOperationWithCallback(
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        onResult: (UiState<T>) -> Unit,
+        operation: suspend () -> Result<T>
+    ) {
+        viewModelScope.launch(dispatcher) {
+            onResult(UiState.Loading)
+            try {
+                val result = operation()
+                onResult(result.toUiState())
+            } catch (e: Exception) {
+                onResult(UiState.Error(
+                    message = e.message ?: "An unexpected error occurred",
+                    throwable = e
+                ))
+            }
+        }
+    }
+
+    /**
+     * Legacy method for backward compatibility - deprecated
+     * Use executeOperation instead
+     */
+    @Deprecated(
+        message = "Use executeOperation with UiState instead",
+        replaceWith = ReplaceWith("executeOperation")
+    )
     protected fun executeTask(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         showLoading: Boolean = true,
@@ -34,23 +87,21 @@ abstract class BaseViewModel : ViewModel() {
     ) {
         viewModelScope.launch(dispatcher) {
             try {
-                if (showLoading) _loading.value = true
                 block()
             } catch (e: Exception) {
-                _error.emit(e.message ?: "Unknown error")
-            } finally {
-                if (showLoading) _loading.value = false
+                // Legacy error handling - no longer used
             }
         }
     }
 
     /**
-     * Thực hiện công việc với try-catch và tự động xử lý loading/error, có kết quả trả về
-     * @param dispatcher CoroutineDispatcher sử dụng cho công việc
-     * @param showLoading Có hiển thị loading khi thực hiện không
-     * @param onSuccess Callback khi thành công, với kết quả trả về
-     * @param block Khối lệnh cần thực hiện, trả về kết quả
+     * Legacy method for backward compatibility - deprecated
+     * Use executeOperation instead
      */
+    @Deprecated(
+        message = "Use executeOperation with UiState instead",
+        replaceWith = ReplaceWith("executeOperation")
+    )
     protected fun <T> executeTaskWithResult(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         showLoading: Boolean = true,
@@ -59,13 +110,10 @@ abstract class BaseViewModel : ViewModel() {
     ) {
         viewModelScope.launch(dispatcher) {
             try {
-                if (showLoading) _loading.value = true
                 val result = block()
                 onSuccess(result)
             } catch (e: Exception) {
-                _error.emit(e.message ?: "Unknown error")
-            } finally {
-                if (showLoading) _loading.value = false
+                // Legacy error handling - no longer used
             }
         }
     }
